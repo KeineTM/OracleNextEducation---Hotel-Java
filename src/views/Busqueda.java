@@ -5,6 +5,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import BackEnd.Huesped;
+import BackEnd.Reserva;
+
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -69,8 +73,9 @@ public class Busqueda extends JFrame {
 		setLocationRelativeTo(null);
 		setUndecorated(true);
 		
+		// Campo de texto para la variable de búsqueda
 		txtBuscar = new JTextField();
-		txtBuscar.setBounds(536, 127, 193, 31);
+		txtBuscar.setBounds(540, 127, 193, 31);
 		txtBuscar.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		contentPane.add(txtBuscar);
 		txtBuscar.setColumns(10);
@@ -88,33 +93,37 @@ public class Busqueda extends JFrame {
 		panel.setBounds(20, 169, 865, 328);
 		contentPane.add(panel);
 
-		
-		
-		
+		// Tabla para impresión de registros de la tabla Reservas		
 		tbReservas = new JTable();
 		tbReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbReservas.setFont(new Font("Roboto", Font.PLAIN, 16));
 		panel.addTab("Reservas", new ImageIcon(Busqueda.class.getResource("/imagenes/reservado.png")), tbReservas, null);
 		modelo = (DefaultTableModel) tbReservas.getModel();
-		modelo.addColumn("Numero de Reserva");
+		modelo.addColumn("Número de Reserva");
 		modelo.addColumn("Fecha Check In");
 		modelo.addColumn("Fecha Check Out");
 		modelo.addColumn("Valor");
 		modelo.addColumn("Forma de Pago");
+		modelo.addColumn("Número de Huésped");
 		
-		
+		// Lógica para imprimir los registros de la tabla con la lista de reservas
+		cargarTablaReservas();
+
+		// Tabla para impresión de registros de la tabla Huéspedes		
 		tbHuespedes = new JTable();
 		tbHuespedes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbHuespedes.setFont(new Font("Roboto", Font.PLAIN, 16));
 		panel.addTab("Huéspedes", new ImageIcon(Busqueda.class.getResource("/imagenes/pessoas.png")), tbHuespedes, null);
 		modeloH = (DefaultTableModel) tbHuespedes.getModel();
-		modeloH.addColumn("Numero de Huesped");
+		modeloH.addColumn("Número de Huesped");
 		modeloH.addColumn("Nombre");
 		modeloH.addColumn("Apellido");
 		modeloH.addColumn("Fecha de Nacimiento");
-		modeloH.addColumn("Nacionalidad");
-		modeloH.addColumn("Telefono");
-		modeloH.addColumn("Numero de Reserva");
+		modeloH.addColumn("Teléfono");
+		modeloH.addColumn("Email");
+
+		// Lógica para imprimir los registros de la tabla con la lista de huéspedes
+		cargarTablaHuéspedes();
 		
 		JLabel lblNewLabel_2 = new JLabel("");
 		lblNewLabel_2.setIcon(new ImageIcon(Busqueda.class.getResource("/imagenes/Ha-100px.png")));
@@ -211,7 +220,7 @@ public class Busqueda extends JFrame {
 		btnbuscar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
+				// Agregar método de búsqueda
 			}
 		});
 		btnbuscar.setLayout(null);
@@ -257,15 +266,49 @@ public class Busqueda extends JFrame {
 		setResizable(false);
 	}
 	
-//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"
-	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
-	        xMouse = evt.getX();
-	        yMouse = evt.getY();
-	    }
+	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"
+	private void headerMousePressed(java.awt.event.MouseEvent evt) {
+        xMouse = evt.getX();
+        yMouse = evt.getY();
+	}
 
-	    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
-	        int x = evt.getXOnScreen();
-	        int y = evt.getYOnScreen();
-	        this.setLocation(x - xMouse, y - yMouse);
-}
+	private void headerMouseDragged(java.awt.event.MouseEvent evt) {
+	    int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse, y - yMouse);
+	}
+
+	private void cargarTablaReservas() {
+		// Instanciamiento de objeto de la clase Reserva para poder emplear el método que devuelve la lista de registros de la tabla
+		Reserva reservas = new Reserva();
+		try {
+			reservas.listar().forEach(reserva -> modelo.addRow(new Object[] {
+				reserva.get("Número de Reserva"),
+				reserva.get("Fecha Check in"),
+				reserva.get("Fecha Check out"),
+				reserva.get("Valor"),
+				reserva.get("Forma de pago"),
+				reserva.get("Número de Huésped")
+			} ));
+		} catch (Exception e) {
+			System.out.println(e);
+		}	
+	}
+
+	private void cargarTablaHuéspedes() {
+		// Instanciamiento de objeto de la clase Reserva para poder emplear el método que devuelve la lista de registros de la tabla
+		Huesped huespedes = new Huesped();
+		try {
+			huespedes.listar().forEach(huesped -> modeloH.addRow(new Object[] {
+				huesped.get("Número de Huésped"),
+				huesped.get("Nombre"),
+				huesped.get("Apellido"),
+				huesped.get("Fecha de Nacimiento"),
+				huesped.get("Teléfono"),
+				huesped.get("Email")
+			} ));
+		} catch (Exception e) {
+			System.out.println(e);
+		}	
+	}
 }

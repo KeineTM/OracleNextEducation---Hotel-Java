@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import BackEnd.Usuario;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,11 +20,12 @@ import javax.swing.SwingConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.SQLException;
 
 public class Login extends JFrame {
 
 	/**
-	 * 
+	 * Variables de GIU
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -116,12 +120,13 @@ public class Login extends JFrame {
 					 txtUsuario.setText("");
 					 txtUsuario.setForeground(Color.black);
 			        }
-			        if (String.valueOf(txtContrasena.getPassword()).isEmpty()) {
-			        	txtContrasena.setText("********");
-			        	txtContrasena.setForeground(Color.gray);
-			        }
+			    if (String.valueOf(txtContrasena.getPassword()).isEmpty()) {
+			    	txtContrasena.setText("********");
+		        	txtContrasena.setForeground(Color.gray);
+		        }
 			}
 		});
+
 		txtUsuario.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtUsuario.setText("Ingrese su nombre de usuario");
 		txtUsuario.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -161,6 +166,7 @@ public class Login extends JFrame {
 		        }
 			}
 		});
+		
 		txtContrasena.setForeground(SystemColor.activeCaptionBorder);
 		txtContrasena.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtContrasena.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -192,9 +198,15 @@ public class Login extends JFrame {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Login();
+				try {
+					// Lógica de la validación de usuario
+					login();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
+
 		btnLogin.setBackground(SystemColor.textHighlight);
 		btnLogin.setBounds(65, 431, 122, 44);
 		panel.add(btnLogin);
@@ -234,28 +246,31 @@ public class Login extends JFrame {
 		header.setLayout(null);
 	}
 	
-	private void Login() {
-		 String Usuario= "admin";
-	     String Contraseña="admin";
+	/**
+	 * Método reescrito para realizar la validación de usuario desde la base de datos del sistema.
+	 * Hace uso del método validar() de la clase usuario para conectarse con la DB y devolver el resultado de la validación.
+	 * */
+	private void login() throws SQLException {
+		Usuario usuario = new Usuario();
+		// Valida si el id de usuari existe y si su contraseña coincide con este
+		if(usuario.validar(txtUsuario.getText(), txtContrasena.getPassword())){
+			// De validarse adecuadamente, despliega la venta de menú de usuario.
+            MenuUsuario menu = new MenuUsuario();
+            menu.setVisible(true);
+            dispose();	 
+        }else { // Sino, muestra el mensaje informando al usuario.
+            JOptionPane.showMessageDialog(this, "Usuario o Contraseña no válidos");
+        }
+	}
 
-	        String contrase=new String (txtContrasena.getPassword());
+	private void headerMousePressed(java.awt.event.MouseEvent evt) {
+	    xMouse = evt.getX();
+	    yMouse = evt.getY();
+	}//GEN-LAST:event_headerMousePressed
 
-	        if(txtUsuario.getText().equals(Usuario) && contrase.equals(Contraseña)){
-	            MenuUsuario menu = new MenuUsuario();
-	            menu.setVisible(true);
-	            dispose();	 
-	        }else {
-	            JOptionPane.showMessageDialog(this, "Usuario o Contraseña no válidos");
-	        }
-	} 
-	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
-	        xMouse = evt.getX();
-	        yMouse = evt.getY();
-	    }//GEN-LAST:event_headerMousePressed
-
-	    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
-	        int x = evt.getXOnScreen();
-	        int y = evt.getYOnScreen();
-	        this.setLocation(x - xMouse, y - yMouse);
-}
+	private void headerMouseDragged(java.awt.event.MouseEvent evt) {
+	    int x = evt.getXOnScreen();
+	    int y = evt.getYOnScreen();
+	    this.setLocation(x - xMouse, y - yMouse);
+	}
 }

@@ -77,7 +77,7 @@ public class MenuPrincipal extends JFrame {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 		
-		JLabel lblCopyR = new JLabel("Desarrollado por Fulanita de Tal © 2022");
+		JLabel lblCopyR = new JLabel("Desarrollado por Jessica Trejo © 2023");
 		lblCopyR.setBounds(315, 11, 284, 19);
 		lblCopyR.setForeground(new Color(240, 248, 255));
 		lblCopyR.setFont(new Font("Roboto", Font.PLAIN, 16));
@@ -89,8 +89,7 @@ public class MenuPrincipal extends JFrame {
 		header.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				headerMouseDragged(e);
-			     
+				headerMouseDragged(e);    
 			}
 		});
 		header.addMouseListener(new MouseAdapter() {
@@ -173,5 +172,5 @@ public class MenuPrincipal extends JFrame {
         int x = evt.getXOnScreen();
         int y = evt.getYOnScreen();
         this.setLocation(x - xMouse, y - yMouse);
-}
+	}
 }
