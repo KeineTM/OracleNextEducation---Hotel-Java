@@ -29,37 +29,13 @@ public class Huesped {
     private String telefono;
     private String email;
 
-    // Setters y Getters
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setNombre(String nombre) {
+    // Constructor con validación de email
+    public Huesped(String nombre, String apellido, LocalDate fechaNacimiento, String telefono, String email) {
         this.nombre = nombre;
-    }
-
-    public void setApellido(String apellido) {
         this.apellido = apellido;
-    }
-
-    /**
-     * La fecha de nacimiento se establece con LocalDate y el método of() para asignarla.
-     * Ej: LocalDate.of(1990, Month.MAY, 23)
-     * @param fechaNacimiento
-     */
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    /**
-     * Este método contiene una validación para el formato del email, en caso de no corresponder lanza la advertencia correspondiente
-     * @param email
-     */
-    public void setEmail(String email) {
+        
         Pattern pattern = Pattern
                 .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         
@@ -71,6 +47,8 @@ public class Huesped {
             JOptionPane.showMessageDialog(null, "Formato de e-mail no válido.");
         }
     }
+
+    public Huesped() {}
 
     public int getId() {
         return id;
@@ -94,6 +72,11 @@ public class Huesped {
 
     public String getEmail() {
         return email;
+    }
+
+    @Override
+    public String toString() {
+        return this.id + " " + this.nombre + " " + this.apellido + " " + this.fechaNacimiento + " " + this.telefono + " " + this.email;
     }
 
     /**

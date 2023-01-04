@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.temporal.ChronoUnit;
 
 import Factory.ConnectionFactory;
 
@@ -19,29 +20,31 @@ public class Reserva {
     private LocalDateTime fechaCheckOut;
     private double importeTotal;
     private int formaPago;
-    public Huesped huesped = new Huesped();
+    public Huesped huesped;
 
-    // Setters y Getters
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setFechaCheckIn(LocalDateTime fechaCheckIn) {
+    // Constructores
+    public Reserva(LocalDateTime fechaCheckIn, LocalDateTime fechaCheckOut, int formaPago, Huesped huesped) {
         this.fechaCheckIn = fechaCheckIn;
-    }
-
-    public void setFechaCheckOut(LocalDateTime fechaCheckOut) {
         this.fechaCheckOut = fechaCheckOut;
-    }
-
-    public void setImporteTotal(float importeTotal) {
-        this.importeTotal = importeTotal;
-    }
-
-    public void setFormaPago(int formaPago) {
+        this.importeTotal = 399 * diasDeReserva(fechaCheckIn, fechaCheckOut);
         this.formaPago = formaPago;
+        this.huesped = huesped;
     }
 
+    public Reserva(){}
+
+    /**
+     * Método que permite calcular los días de que abarca la reserva.
+     * Emplea la clase ChronoUnit y su método between() para realizar la comparación entre fechas.
+     * @param fechaCheckIn
+     * @param fechaCheckOut
+     * @return
+     */
+    private long diasDeReserva(LocalDateTime fechaCheckIn, LocalDateTime fechaCheckOut) {
+        return ChronoUnit.DAYS.between(fechaCheckIn, fechaCheckOut);
+    }
+
+    // Getters
     public int getId() {
         return id;
     }
@@ -67,7 +70,6 @@ public class Reserva {
      *  */
     public List<Map<String, String>> listar() throws SQLException {
         Connection con = new ConnectionFactory().recuperaConexion();
-
         Statement statement = con.createStatement();
         // Java en automático sugiere almacenar el resultado en una variable de tipo boolean
         // Esto se debe a que identifica si el resultado es una lista de registros (como en el caso de un SELECT) o no (como UPDATE, DELETE, etc)
@@ -93,5 +95,13 @@ public class Reserva {
         con.close();
 
         return resultado;
+    }
+
+    /**
+     * Método que realiza el registro de una reserva en base de datos a partir de un objeto instanciado de esta clase
+     * @param reserva
+     */
+    public void registarEnDB(Reserva reserva) {
+
     }
 }

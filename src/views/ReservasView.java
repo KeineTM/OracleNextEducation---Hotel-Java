@@ -303,6 +303,7 @@ public class ReservasView extends JFrame {
 				}
 			}						
 		});
+
 		btnsiguiente.setLayout(null);
 		btnsiguiente.setBackground(SystemColor.textHighlight);
 		btnsiguiente.setBounds(238, 493, 122, 35);
@@ -318,14 +319,14 @@ public class ReservasView extends JFrame {
 	}
 
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	
-	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
-	        xMouse = evt.getX();
-	        yMouse = evt.getY();
-	    }
+	private void headerMousePressed(java.awt.event.MouseEvent evt) {
+        xMouse = evt.getX();
+        yMouse = evt.getY();
+    }
 
-	    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
-	        int x = evt.getXOnScreen();
-	        int y = evt.getYOnScreen();
-	        this.setLocation(x - xMouse, y - yMouse);
-}
+    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse, y - yMouse);
+	}
 }
