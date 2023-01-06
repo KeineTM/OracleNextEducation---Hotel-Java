@@ -11,15 +11,12 @@ import BackEnd.Reserva;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.Color;
-import java.awt.SystemColor;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -28,6 +25,8 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.SQLException;
+import java.util.Optional;
 
 @SuppressWarnings("serial")
 public class Busqueda extends JFrame {
@@ -135,7 +134,6 @@ public class Busqueda extends JFrame {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				headerMouseDragged(e);
-			     
 			}
 		});
 		header.addMouseListener(new MouseAdapter() {
@@ -256,6 +254,13 @@ public class Busqueda extends JFrame {
 		btnEliminar.setBounds(767, 508, 122, 35);
 		btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnEliminar);
+		btnEliminar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// Lógica para la eliminación de registros de la base de datos desde la interfaz gráfica.
+				eliminarReserva();
+			}
+		});
 		
 		JLabel lblEliminar = new JLabel("ELIMINAR");
 		lblEliminar.setHorizontalAlignment(SwingConstants.CENTER);
@@ -298,6 +303,7 @@ public class Busqueda extends JFrame {
 	private void cargarTablaHuéspedes() {
 		// Instanciamiento de objeto de la clase Reserva para poder emplear el método que devuelve la lista de registros de la tabla
 		Huesped huespedes = new Huesped();
+		
 		try {
 			huespedes.listar().forEach(huesped -> modeloH.addRow(new Object[] {
 				huesped.get("Número de Huésped"),
@@ -310,5 +316,31 @@ public class Busqueda extends JFrame {
 		} catch (Exception e) {
 			System.out.println(e);
 		}	
+	}
+
+	/**
+	 * Método que elimina el registro seleccionado en base de datos.
+	 * Valida que se haya seleccionado una fila de la JTable para ejecutar la eliminación.
+	 */
+	private void eliminarReserva() {
+		if(tbReservas.getSelectedRow() == -1 ) {
+			JOptionPane.showMessageDialog(this, "Seleccione un registro para eliminar.");
+		} else {
+			Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresentOrElse(fila -> {
+				Integer id = Integer.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString());
+	
+				Reserva reserva = new Reserva();
+				try {
+					reserva.eliminar(id);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+	
+				modelo.removeRow(tbReservas.getSelectedRow());
+				JOptionPane.showMessageDialog(this, "Reserva eliminada exitosamente.");
+	
+			}, () -> JOptionPane.showMessageDialog(this, "Seleccione una reserva."));
+		}
+		
 	}
 }

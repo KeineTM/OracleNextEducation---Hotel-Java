@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `Habitaciones` ( -- Tabla Dependiente
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;;
 
 CREATE TABLE IF NOT EXISTS `Huespedes` (
-    Id INT PRIMARY KEY NOT NULL,
+    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     Nombre VARCHAR(70) NOT NULL,
     Apellido VARCHAR(150) NOT NULL,
     FechaNacimiento DATE NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `FormasPago` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE TABLE IF NOT EXISTS `Reservas` (
-    Id INT PRIMARY KEY NOT NULL,
+    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     FechaEntrada DATETIME NOT NULL, -- Formato AAAA-MM-DD 00:00:00
     FechaSalida DATETIME NOT NULL,
     ImporteTotal FLOAT NOT NULL,
@@ -90,9 +90,13 @@ INSERT INTO FormasPago VALUES
     (4, "Tarjeta de regalo")
 ;
 
-INSERT INTO Huespedes VALUES
-    (1, "Jessica", "Trejo", "2000-11-11","0123456789","jessica.trejo@alura.com")
-;
+-- Formato de registro de reservas y huéspedes desde el programa en Java:
+INSERT INTO Huespedes (Nombre, Apellido, FechaNacimiento, Telefono, Email) VALUES
+    ("Edson", "Trejo", "2006-11-11","0123456789","ed.trejo@alura.com");
+    
+INSERT INTO Reservas (FechaEntrada, FechaSalida, ImporteTotal, FormaPago, IdHuesped) VALUES
+    ("","","",,);
 
--- Consultas a la DB
-SELECT * FROM 
+SELECT Reservas.Id, Reservas.FechaEntrada, Reservas.FechaSalida, Reservas.ImporteTotal, FormasPago.Descripcion, Reservas.IdHuesped
+FROM Reservas
+INNER JOIN FormasPago ON FormasPago.Id = Reservas.FormaPago;

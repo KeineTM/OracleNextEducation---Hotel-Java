@@ -52,8 +52,9 @@ public class Exito extends JDialog {
 			lblNewLabel.setBounds(123, 11, 100, 100);
 			contentPanel.add(lblNewLabel);
 		}
+		
 		{
-			JLabel lblNewLabel_1 = new JLabel("Datos guardados satisfactoriamente");
+			JLabel lblNewLabel_1 = new JLabel("Datos guardados satisfactoriamente para la reserva");
 			lblNewLabel_1.setForeground(new Color (12, 138, 199));
 			lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 18));
 			lblNewLabel_1.setBounds(27, 122, 322, 21);

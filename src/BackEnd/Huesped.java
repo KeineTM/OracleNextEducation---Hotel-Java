@@ -1,6 +1,7 @@
 package BackEnd;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JOptionPane;
 
 import Factory.ConnectionFactory;
 
@@ -35,8 +34,8 @@ public class Huesped {
         this.apellido = apellido;
         this.fechaNacimiento = fechaNacimiento;
         this.telefono = telefono;
-        
-        Pattern pattern = Pattern
+        this.email = email;
+        /*Pattern pattern = Pattern
                 .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         
         Matcher validacion = pattern.matcher(email);
@@ -45,17 +44,21 @@ public class Huesped {
             this.email = email;
         } else {
             JOptionPane.showMessageDialog(null, "Formato de e-mail no válido.");
-        }
+        }*/
     }
 
     public Huesped() {}
 
+    private void setId(int id) {
+        this.id = id;
+    }
+    
     public int getId() {
         return id;
     }
-    
+
     public String getNombre() {
-        return this.nombre;
+        return nombre;
     }
 
     public String getApellido() {
@@ -84,10 +87,9 @@ public class Huesped {
      *  */
     public List<Map<String, String>> listar() throws SQLException {
         Connection con = new ConnectionFactory().recuperaConexion();
-        Statement statement = con.createStatement();
+        PreparedStatement statement = con.prepareStatement("SELECT * FROM Huespedes");
         
-        statement.execute("SELECT * FROM Huespedes");
-        
+        statement.execute();
         // Permite almacenar el listado resultante
         ResultSet resultSet = statement.getResultSet();
         // Variable para almacenar el listado
@@ -108,5 +110,37 @@ public class Huesped {
         con.close();
 
         return resultado;
+    }
+
+    /**
+     * Método que realiza el registro de un huesped en base de datos a partir de un objeto instanciado de esta clase
+     * @param huesped
+     * @throws SQLException
+     */
+    public void registarEnDB() throws SQLException {
+        Connection con = new ConnectionFactory().recuperaConexion();
+        PreparedStatement statement = con.prepareStatement("INSERT INTO Huespedes (Nombre, Apellido, FechaNacimiento, Telefono, Email)" 
+            + "VALUES (?,?,?,?,?)", 
+            Statement.RETURN_GENERATED_KEYS); // Recupera el id creado en la tabla con el AUTO_INCREMENT de la clave primaria);
+
+        statement.setString(1, this.nombre);
+        statement.setString(2, this.apellido);
+        statement.setString(3, this.fechaNacimiento.toString());
+        statement.setString(4, this.telefono);
+        statement.setString(5, email);
+
+        try {
+            statement.execute(); 
+
+            ResultSet resultSet = statement.getGeneratedKeys();
+            while(resultSet.next()) {
+                setId(resultSet.getInt(1)); // Lo asigna al atributo Id del objeto para enviarlo al registro de la reserva
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            con.close();
+        }
     }
 }

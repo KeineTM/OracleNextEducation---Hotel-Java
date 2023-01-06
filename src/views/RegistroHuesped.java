@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.SQLException;
 import java.text.Format;
 import java.time.ZoneId;
 import java.awt.event.ActionEvent;
@@ -234,22 +235,45 @@ public class RegistroHuesped extends JFrame {
 		JPanel btnguardar = new JPanel();
 		btnguardar.setBounds(723, 560, 122, 35);
 		btnguardar.addMouseListener(new MouseAdapter() {
-			// Lógica del botón para almacenar el registro en base de datos
+			/**
+			 * Lógica del botón para guardar el registro en base de datos.
+			 * Crea un objeto huesped con el constructor y paso de argumentos.
+			 * Crea un objeto reserva con el constructor y paso de argumentos.
+			 * Ejecuta los métodos de cada objeto para guardar el registro.
+			 * */ 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Huesped huesped = new Huesped(
-					txtNombre.getText(), 
-					txtApellido.getText(), 
-					txtFechaN.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), 
-					txtTelefono.getText(), 
-					txtEmail.getText());
-				Reserva reserva = new Reserva(
-					ReservasView.txtFechaE.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
-					ReservasView.txtFechaS.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
-					1, 
-					huesped);
+				if(txtNombre.getText() != null && 
+						txtApellido.getText() != null && 
+						txtFechaN.getDate() != null &&
+						txtTelefono.getText() != null &&
+						txtEmail.getText() != null) {
+					
+					try {
+						Huesped huesped = new Huesped(
+							txtNombre.getText(), 
+							txtApellido.getText(), 
+							txtFechaN.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), 
+							txtTelefono.getText(), 
+							txtEmail.getText());
+						
+						Reserva reserva = new Reserva(ReservasView.txtSeleccionarH.getSelectedIndex(), 
+							ReservasView.txtFechaE.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
+							ReservasView.txtFechaS.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
+							ReservasView.txtFormaPago.getSelectedIndex(), 
+							huesped);
 
-				System.out.println(huesped);
+						huesped.registarEnDB(); // Primero se registra el huesped
+						reserva.registarEnDB(); // Después la reserva con la clave del huesped
+
+						Exito exito = new Exito();
+						exito.setVisible(true);
+					} catch (SQLException e2) {
+						e2.printStackTrace();
+					}	
+				} else {
+					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
+				}
 			}
 		});
 		btnguardar.setLayout(null);
