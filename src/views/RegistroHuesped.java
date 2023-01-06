@@ -268,6 +268,7 @@ public class RegistroHuesped extends JFrame {
 
 						Exito exito = new Exito();
 						exito.setVisible(true);
+						dispose();
 					} catch (SQLException e2) {
 						e2.printStackTrace();
 					}	

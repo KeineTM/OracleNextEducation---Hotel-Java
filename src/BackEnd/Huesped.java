@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 import Factory.ConnectionFactory;
 
 /**
@@ -35,7 +37,7 @@ public class Huesped {
         this.fechaNacimiento = fechaNacimiento;
         this.telefono = telefono;
         this.email = email;
-        /*Pattern pattern = Pattern
+        Pattern pattern = Pattern
                 .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         
         Matcher validacion = pattern.matcher(email);
@@ -44,7 +46,7 @@ public class Huesped {
             this.email = email;
         } else {
             JOptionPane.showMessageDialog(null, "Formato de e-mail no válido.");
-        }*/
+        }
     }
 
     public Huesped() {}
@@ -118,29 +120,31 @@ public class Huesped {
      * @throws SQLException
      */
     public void registarEnDB() throws SQLException {
-        Connection con = new ConnectionFactory().recuperaConexion();
-        PreparedStatement statement = con.prepareStatement("INSERT INTO Huespedes (Nombre, Apellido, FechaNacimiento, Telefono, Email)" 
+        final Connection con = new ConnectionFactory().recuperaConexion();
+        try(con) {
+            final PreparedStatement statement = con.prepareStatement("INSERT INTO Huespedes (Nombre, Apellido, FechaNacimiento, Telefono, Email)" 
             + "VALUES (?,?,?,?,?)", 
             Statement.RETURN_GENERATED_KEYS); // Recupera el id creado en la tabla con el AUTO_INCREMENT de la clave primaria);
 
-        statement.setString(1, this.nombre);
-        statement.setString(2, this.apellido);
-        statement.setString(3, this.fechaNacimiento.toString());
-        statement.setString(4, this.telefono);
-        statement.setString(5, email);
+            statement.setString(1, this.nombre);
+            statement.setString(2, this.apellido);
+            statement.setString(3, this.fechaNacimiento.toString());
+            statement.setString(4, this.telefono);
+            statement.setString(5, email);
 
-        try {
-            statement.execute(); 
-
-            ResultSet resultSet = statement.getGeneratedKeys();
-            while(resultSet.next()) {
-                setId(resultSet.getInt(1)); // Lo asigna al atributo Id del objeto para enviarlo al registro de la reserva
+            try(statement) {
+                statement.execute(); 
+                ResultSet resultSet = statement.getGeneratedKeys();
+                
+                try(resultSet) {
+                    while(resultSet.next()) {
+                        setId(resultSet.getInt(1)); // Lo asigna al atributo Id del objeto para enviarlo al registro de la reserva
+                    }
+                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            con.close();
         }
     }
 }
