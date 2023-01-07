@@ -343,4 +343,26 @@ public class Busqueda extends JFrame {
 		}
 		
 	}
+
+	/*public void editarReserva() {
+		if(tbReservas.getSelectedRow() == -1 ) {
+			JOptionPane.showMessageDialog(this, "Seleccione un registro para eliminar.");
+		} else {
+			Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresentOrElse(fila -> {
+				Integer id = Integer.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString());
+	
+				Reserva reserva = new Reserva();
+				try {
+					reserva.editar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+	
+				modelo.removeRow(tbReservas.getSelectedRow());
+				JOptionPane.showMessageDialog(this, "Reserva eliminada exitosamente.");
+	
+			}, () -> JOptionPane.showMessageDialog(this, "Seleccione una reserva."));
+		}
+		
+	}*/
 }

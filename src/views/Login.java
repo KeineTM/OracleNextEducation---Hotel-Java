@@ -251,9 +251,9 @@ public class Login extends JFrame {
 	 * Hace uso del método validar() de la clase usuario para conectarse con la DB y devolver el resultado de la validación.
 	 * */
 	private void login() throws SQLException {
-		Usuario usuario = new Usuario();
+		Usuario usuario = new Usuario(txtUsuario.getText(), txtContrasena.getPassword().toString());
 		// Valida si el id de usuari existe y si su contraseña coincide con este
-		if(usuario.validar(txtUsuario.getText(), txtContrasena.getPassword())){
+		if(usuario.validar(usuario)){
 			// De validarse adecuadamente, despliega la venta de menú de usuario.
             MenuUsuario menu = new MenuUsuario();
             menu.setVisible(true);
