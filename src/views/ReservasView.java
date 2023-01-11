@@ -12,7 +12,8 @@ import java.awt.Color;
 import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
 
-import BackEnd.Reserva;
+import Controller.Reserva;
+import javafx.event.ActionEvent;
 
 import java.awt.Font;
 import javax.swing.JComboBox;
@@ -24,7 +25,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeListener;
-import java.sql.SQLException;
 import java.beans.PropertyChangeEvent;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -78,8 +78,6 @@ public class ReservasView extends JFrame {
 		setLocationRelativeTo(null);
 		setUndecorated(true);
 		
-
-		
 		JPanel panel = new JPanel();
 		panel.setBorder(null);
 		panel.setBackground(Color.WHITE);
@@ -130,6 +128,11 @@ public class ReservasView extends JFrame {
 			"Matrimonial doble: 2 camas matrimoniales"
 		}));
 		panel.add(txtSeleccionarH);
+		txtSeleccionarH.addActionListener(event -> {
+			txtFechaE.setCalendar(null);
+			txtFechaS.setCalendar(null);
+			txtValor.setText("");
+		});
 
 		JLabel lblSeleccionarH = new JLabel("TIPO DE HABITACIÓN");
 		lblSeleccionarH.setForeground(SystemColor.textInactiveText);
@@ -176,13 +179,10 @@ public class ReservasView extends JFrame {
 				Reserva reserva = new Reserva();
 				double valor = 0;
 				if(txtFechaE.getDate() != null && txtFechaS.getDate() != null) {
-					try {
-						valor = reserva.getCostoDeHabitacion(txtSeleccionarH.getSelectedIndex()) * reserva.diasDeReserva(
-								txtFechaE.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
-								txtFechaS.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+					valor = reserva.getCostoDeHabitacion(txtSeleccionarH.getSelectedIndex()) * reserva.diasDeReserva(
+							txtFechaE.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
+							txtFechaS.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+					
 					txtValor.setText("$ "+ String.valueOf(valor));
 				}
 			}
@@ -328,11 +328,16 @@ public class ReservasView extends JFrame {
 		
 		JPanel btnsiguiente = new JPanel();
 		btnsiguiente.addMouseListener(new MouseAdapter() {
+			/**
+			 * Método del botón siguiente que permite continuar con el registro de la reserva con los datos del huesped
+			 * @param e
+			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (ReservasView.txtFechaE.getDate() != null && ReservasView.txtFechaS.getDate() != null) {		
 					RegistroHuesped registro = new RegistroHuesped();
 					registro.setVisible(true);
+					dispose();
 				} else {
 					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
 				}

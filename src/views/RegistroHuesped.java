@@ -8,23 +8,19 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
 
-import BackEnd.Huesped;
-import BackEnd.Reserva;
+import Controller.Huesped;
+import Controller.Reserva;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.Font;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import java.awt.SystemColor;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.sql.SQLException;
-import java.text.Format;
 import java.time.ZoneId;
-import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
@@ -243,35 +239,31 @@ public class RegistroHuesped extends JFrame {
 			 * */ 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(txtNombre.getText() != null && 
-						txtApellido.getText() != null && 
-						txtFechaN.getDate() != null &&
-						txtTelefono.getText() != null &&
-						txtEmail.getText() != null) {
+				if(txtNombre.getText().length() != 0 && 
+					txtApellido.getText().length() != 0 && 
+					txtFechaN.getDate() != null &&
+					txtTelefono.getText().length() != 0 &&
+					txtEmail.getText().length() != 0) {
 					
-					try {
-						Huesped huesped = new Huesped(
-							txtNombre.getText(), 
-							txtApellido.getText(), 
-							txtFechaN.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), 
-							txtTelefono.getText(), 
-							txtEmail.getText());
+					Huesped huesped = new Huesped(
+						txtNombre.getText(), 
+						txtApellido.getText(), 
+						txtFechaN.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), 
+						txtTelefono.getText(), 
+						txtEmail.getText());
 						
-						Reserva reserva = new Reserva(ReservasView.txtSeleccionarH.getSelectedIndex(), 
-							ReservasView.txtFechaE.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
-							ReservasView.txtFechaS.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
-							ReservasView.txtFormaPago.getSelectedIndex(), 
-							huesped);
+					Reserva reserva = new Reserva(ReservasView.txtSeleccionarH.getSelectedIndex(), 
+						ReservasView.txtFechaE.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
+						ReservasView.txtFechaS.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), 
+						ReservasView.txtFormaPago.getSelectedIndex(), 
+						huesped);
 
-						huesped.registarEnDB(); // Primero se registra el huesped
-						reserva.registarEnDB(); // Después la reserva con la clave del huesped
+					huesped.registarEnDB(); // Primero se registra el huesped
+					reserva.registarEnDB(); // Después la reserva con la clave del huesped
 
-						Exito exito = new Exito();
-						exito.setVisible(true);
-						dispose();
-					} catch (SQLException e2) {
-						e2.printStackTrace();
-					}	
+					Exito exito = new Exito();
+					exito.setVisible(true);
+					dispose();
 				} else {
 					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
 				}
@@ -348,9 +340,5 @@ public class RegistroHuesped extends JFrame {
         int x = evt.getXOnScreen();
         int y = evt.getYOnScreen();
         this.setLocation(x - xMouse, y - yMouse);
-	}
-	
-	private void registrarReserva() {
-		String fechaE = ReservasView.txtFechaE.getDateFormatString();
 	}
 }

@@ -5,9 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-
-import BackEnd.Usuario;
+import Controller.Usuario;
 import Factory.ConnectionFactory;
 
 // Clase que permite ordenar el código concentrando los métodos que se conectan con la base de datos
@@ -20,7 +18,7 @@ public class UsuarioDAO {
      * @return true: si se encuentra el Id en la tabla o false: si no se encuentra.
      * @throws SQLException
      */
-    public boolean validar(Usuario usuario) throws SQLException {
+    public boolean validar(Usuario usuario){
         final Connection con = new ConnectionFactory().recuperaConexion();
         try(con) {
             final PreparedStatement statement = con.prepareStatement("SELECT * FROM Usuarios WHERE Id= ?");    
@@ -34,9 +32,8 @@ public class UsuarioDAO {
                     else return false; 
                 }
             }   
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

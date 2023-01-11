@@ -10,36 +10,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import BackEnd.Huesped;
+import Controller.Huesped;
 import Factory.ConnectionFactory;
 
 public class HuespedDAO {
     /**
      * Método que conecta con la base de datos y devuelve una lista con todos los registros de la tabla Huespedes.
      *  */
-    public List<Map<String, String>> listar() throws SQLException {
-        Connection con = new ConnectionFactory().recuperaConexion();
-        PreparedStatement statement = con.prepareStatement("SELECT * FROM Huespedes");
-        
-        statement.execute();
-        // Permite almacenar el listado resultante
-        ResultSet resultSet = statement.getResultSet();
+    public List<Map<String, String>> listar() {
         // Variable para almacenar el listado
         ArrayList<Map<String, String>> resultado = new ArrayList<>();
-        // Mientras exista un elemento en la lista se almacenará la información como un registro o fila
-        while(resultSet.next()) {
-            Map<String, String> fila = new HashMap<>();
-            fila.put("Número de Huésped", String.valueOf(resultSet.getInt("Id")));
-            fila.put("Nombre", resultSet.getString("Nombre"));
-            fila.put("Apellido", resultSet.getString("Apellido"));
-            fila.put("Fecha de Nacimiento", resultSet.getString("FechaNacimiento"));
-            fila.put("Teléfono", resultSet.getString("Telefono"));
-            fila.put("Email", resultSet.getString("Email"));
+        final Connection con = new ConnectionFactory().recuperaConexion();
 
-            resultado.add(fila);
+        try(con) {
+        final PreparedStatement statement = con.prepareStatement("SELECT * FROM Huespedes");
+        
+            try(statement) {
+                statement.execute();
+                // Permite almacenar el listado resultante
+                final ResultSet resultSet = statement.getResultSet();
+                
+
+                try(resultSet) {
+                    // Mientras exista un elemento en la lista se almacenará la información como un registro o fila
+                    while(resultSet.next()) {
+                        Map<String, String> fila = new HashMap<>();
+                        fila.put("Número de Huésped", String.valueOf(resultSet.getInt("Id")));
+                        fila.put("Nombre", resultSet.getString("Nombre"));
+                        fila.put("Apellido", resultSet.getString("Apellido"));
+                        fila.put("Fecha de Nacimiento", resultSet.getString("FechaNacimiento"));
+                        fila.put("Teléfono", resultSet.getString("Telefono"));
+                        fila.put("Email", resultSet.getString("Email"));
+
+                        resultado.add(fila);
+                    }
+                }
+            }
+        } catch(SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        con.close();
 
         return resultado;
     }
@@ -48,7 +57,7 @@ public class HuespedDAO {
      * Método que realiza el registro de un huesped en base de datos a partir de un objeto instanciado de esta clase
      * @throws SQLException
      */
-    public void registarEnDB(Huesped huesped) throws SQLException {
+    public void registarEnDB(Huesped huesped) {
         final Connection con = new ConnectionFactory().recuperaConexion();
         try(con) {
             final PreparedStatement statement = con.prepareStatement("INSERT INTO Huespedes (Nombre, Apellido, FechaNacimiento, Telefono, Email)" 
@@ -72,8 +81,8 @@ public class HuespedDAO {
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

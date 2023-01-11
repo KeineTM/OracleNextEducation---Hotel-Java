@@ -6,8 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import BackEnd.Huesped;
-import BackEnd.Reserva;
+import Controller.Huesped;
+import Controller.Reserva;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -25,14 +25,13 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.sql.SQLException;
 import java.util.Optional;
 
 @SuppressWarnings("serial")
 public class Busqueda extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField txtBuscar;
+	public static JTextField txtBuscar;
 	private JTable tbHuespedes;
 	private JTable tbReservas;
 	private DefaultTableModel modelo;
@@ -76,9 +75,8 @@ public class Busqueda extends JFrame {
 		txtBuscar = new JTextField();
 		txtBuscar.setBounds(540, 127, 193, 31);
 		txtBuscar.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		contentPane.add(txtBuscar);
 		txtBuscar.setColumns(10);
-		
+		contentPane.add(txtBuscar);
 		
 		JLabel lblNewLabel_4 = new JLabel("SISTEMA DE BÚSQUEDA");
 		lblNewLabel_4.setForeground(new Color(12, 138, 199));
@@ -215,17 +213,17 @@ public class Busqueda extends JFrame {
 		contentPane.add(separator_1_2);
 		
 		JPanel btnbuscar = new JPanel();
-		btnbuscar.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// Agregar método de búsqueda
-			}
-		});
 		btnbuscar.setLayout(null);
 		btnbuscar.setBackground(new Color(12, 138, 199));
 		btnbuscar.setBounds(748, 125, 122, 35);
 		btnbuscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnbuscar);
+		btnbuscar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				buscarReserva();
+			}
+		});
 		
 		JLabel lblBuscar = new JLabel("BUSCAR");
 		lblBuscar.setBounds(0, 0, 122, 35);
@@ -286,36 +284,54 @@ public class Busqueda extends JFrame {
 	private void cargarTablaReservas() {
 		// Instanciamiento de objeto de la clase Reserva para poder emplear el método que devuelve la lista de registros de la tabla
 		Reserva reservas = new Reserva();
-		try {
-			reservas.listar().forEach(reserva -> modelo.addRow(new Object[] {
-				reserva.get("Número de Reserva"),
-				reserva.get("Fecha Check in"),
-				reserva.get("Fecha Check out"),
-				reserva.get("Valor"),
-				reserva.get("Forma de pago"),
-				reserva.get("Número de Huésped")
-			} ));
-		} catch (Exception e) {
-			System.out.println(e);
-		}	
+
+		reservas.listar().forEach(reserva -> modelo.addRow(new Object[] {
+			reserva.get("Número de Reserva"),
+			reserva.get("Fecha Check in"),
+			reserva.get("Fecha Check out"),
+			reserva.get("Valor"),
+			reserva.get("Forma de pago"),
+			reserva.get("Número de Huésped")
+		} ));
 	}
 
 	private void cargarTablaHuéspedes() {
 		// Instanciamiento de objeto de la clase Reserva para poder emplear el método que devuelve la lista de registros de la tabla
 		Huesped huespedes = new Huesped();
 		
-		try {
-			huespedes.listar().forEach(huesped -> modeloH.addRow(new Object[] {
-				huesped.get("Número de Huésped"),
-				huesped.get("Nombre"),
-				huesped.get("Apellido"),
-				huesped.get("Fecha de Nacimiento"),
-				huesped.get("Teléfono"),
-				huesped.get("Email")
-			} ));
-		} catch (Exception e) {
-			System.out.println(e);
-		}	
+		huespedes.listar().forEach(huesped -> modeloH.addRow(new Object[] {
+			huesped.get("Número de Huésped"),
+			huesped.get("Nombre"),
+			huesped.get("Apellido"),
+			huesped.get("Fecha de Nacimiento"),
+			huesped.get("Teléfono"),
+			huesped.get("Email")
+		} ));
+	}
+
+	/**
+	 * Método del botón Buscar que recupera la cadena introducida por el usuario en el campo txtBuscar
+	 * Evalúa que la cadena no se encuentre vacía
+	 * Y que el contenido corresponda con un número entero
+	 * Para desplegar la ventana con el resultado de la búsqueda
+	 */
+	private void buscarReserva() {
+		if(txtBuscar.getText().length() != 0) {
+			if(esUnNumero(txtBuscar.getText())) {
+				Reserva reserva = new Reserva();
+				reserva = reserva.buscar(Integer.valueOf(txtBuscar.getText()));
+				if(reserva != null) {
+					BusquedaResultado resultado = new BusquedaResultado();
+					resultado.setVisible(true);
+				} else {
+					JOptionPane.showMessageDialog(this, "No existe el número de reserva: " + txtBuscar.getText());
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Ingrese un número entero como ID de Reserva para buscar");
+			}
+		} else {
+			JOptionPane.showMessageDialog(this, "Ingrese un número entero como ID de Reserva para buscar");
+		}
 	}
 
 	/**
@@ -330,11 +346,7 @@ public class Busqueda extends JFrame {
 				Integer id = Integer.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString());
 	
 				Reserva reserva = new Reserva();
-				try {
-					reserva.eliminar(id);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				reserva.eliminar(id);
 	
 				modelo.removeRow(tbReservas.getSelectedRow());
 				JOptionPane.showMessageDialog(this, "Reserva eliminada exitosamente.");
@@ -353,7 +365,9 @@ public class Busqueda extends JFrame {
 	
 				Reserva reserva = new Reserva();
 				try {
-					reserva.editar();
+					reserva.editar(
+						modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())
+					);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -365,4 +379,18 @@ public class Busqueda extends JFrame {
 		}
 		
 	}*/
+
+	/**
+	 * Método para evaluar la entrada de números enteros (Integer)
+	 * @param cadena tipo String
+	 * @return true o false
+	*/
+	private static boolean esUnNumero(String cadena){
+		try {
+			Integer.parseInt(cadena);
+			return true;
+		} catch (NumberFormatException e){
+			return false;
+		}
+	}
 }

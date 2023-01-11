@@ -1,6 +1,4 @@
-package BackEnd;
-
-import java.sql.SQLException;
+package Controller;
 
 import DAO.UsuarioDAO;
 
@@ -23,7 +21,7 @@ public class Usuario {
         return password;
     }
 
-    public boolean validar() throws SQLException {
+    public boolean validar() {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
 
         return usuarioDAO.validar(this);

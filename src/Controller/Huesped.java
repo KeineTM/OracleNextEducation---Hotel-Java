@@ -1,7 +1,7 @@
-package BackEnd;
+package Controller;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -23,6 +23,7 @@ public class Huesped {
     private LocalDate fechaNacimiento; // Formato AAAA/MM/DD
     private String telefono;
     private String email;
+    private String stringfechaNacimiento;
 
     // Constructor con validación de email
     public Huesped(String nombre, String apellido, LocalDate fechaNacimiento, String telefono, String email) {
@@ -44,6 +45,15 @@ public class Huesped {
     }
 
     public Huesped() {}
+
+    public Huesped(int id, String nombre, String apellido, String stringfechaNacimiento, String telefono, String email) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.stringfechaNacimiento = stringfechaNacimiento;
+        this.telefono = telefono;
+        this.email = email;
+    }
 
     public void setId(int id) {
         this.id = id;
@@ -73,6 +83,10 @@ public class Huesped {
         return email;
     }
 
+    public String getStringfechaNacimiento() {
+        return stringfechaNacimiento;
+    }
+
     @Override
     public String toString() {
         return this.id + " " + this.nombre + " " + this.apellido + " " + this.fechaNacimiento + " " + this.telefono + " " + this.email;
@@ -81,7 +95,7 @@ public class Huesped {
     /**
      * Método que conecta con la base de datos y devuelve una lista con todos los registros de la tabla Huespedes.
      *  */
-    public List<Map<String, String>> listar() throws SQLException {
+    public List<Map<String, String>> listar() {
         HuespedDAO huespedDAO = new HuespedDAO();
 
         return huespedDAO.listar();
@@ -89,9 +103,8 @@ public class Huesped {
 
     /**
      * Método que realiza el registro de un huesped en base de datos a partir de un objeto instanciado de esta clase
-     * @throws SQLException
      */
-    public void registarEnDB() throws SQLException {
+    public void registarEnDB() {
         HuespedDAO huespedDAO = new HuespedDAO();
 
         huespedDAO.registarEnDB(this);

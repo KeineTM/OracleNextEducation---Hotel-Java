@@ -82,6 +82,7 @@ public class Exito extends JDialog {
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
+			
 		}
 	}
 

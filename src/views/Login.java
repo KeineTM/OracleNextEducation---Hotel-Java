@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import BackEnd.Usuario;
+import Controller.Usuario;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -253,7 +253,7 @@ public class Login extends JFrame {
 	private void login() throws SQLException {
 		Usuario usuario = new Usuario(txtUsuario.getText(), txtContrasena.getPassword().toString());
 		// Valida si el id de usuari existe y si su contraseña coincide con este
-		if(usuario.validar(usuario)){
+		if(usuario.validar()){
 			// De validarse adecuadamente, despliega la venta de menú de usuario.
             MenuUsuario menu = new MenuUsuario();
             menu.setVisible(true);

@@ -1,21 +1,13 @@
-package BackEnd;
+package Controller;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
 import DAO.ReservaDAO;
 
 import java.time.temporal.ChronoUnit;
-
-import Factory.ConnectionFactory;
 
 public class Reserva {
     // Atributos
@@ -25,9 +17,11 @@ public class Reserva {
     private double importeTotal;
     private int formaPago;
     public Huesped huesped;
+    private String stringFechaCheckIn;
+    private String stringFechaCheckOut;
 
     // Constructores
-    public Reserva(int tipoHabitacion, LocalDateTime fechaCheckIn, LocalDateTime fechaCheckOut, int formaPago, Huesped huesped) throws SQLException {
+    public Reserva(int tipoHabitacion, LocalDateTime fechaCheckIn, LocalDateTime fechaCheckOut, int formaPago, Huesped huesped) {
         this.fechaCheckIn = fechaCheckIn;
         this.fechaCheckOut = fechaCheckOut;
         this.importeTotal = diasDeReserva(fechaCheckIn, fechaCheckOut) * getCostoDeHabitacion(tipoHabitacion);
@@ -36,6 +30,17 @@ public class Reserva {
     }
 
     public Reserva(){}
+
+    
+
+    public Reserva(int id, String stringFechaCheckIn, String stringFechaCheckOut, int formaPago, double importeTotal, Huesped huesped) {
+        this.id = id;
+        this.stringFechaCheckIn = stringFechaCheckIn;
+        this.stringFechaCheckOut = stringFechaCheckOut;
+        this.importeTotal = importeTotal;
+        this.formaPago = formaPago;
+        this.huesped = huesped;
+    }
 
     /**
      * Método que permite calcular los días de que abarca la reserva.
@@ -48,7 +53,7 @@ public class Reserva {
         return (double) ChronoUnit.DAYS.between(fechaCheckIn, fechaCheckOut);
     }
 
-    public Double getCostoDeHabitacion(int tipoHabitacion) throws SQLException {
+    public Double getCostoDeHabitacion(int tipoHabitacion) {
         ReservaDAO reservaDAO = new ReservaDAO();
 
         return reservaDAO.getCostoDeHabitacion(tipoHabitacion);
@@ -78,6 +83,14 @@ public class Reserva {
         return formaPago;
     }
 
+    public String getStringFechaCheckIn() {
+        return stringFechaCheckIn;
+    }
+
+    public String getStringFechaCheckOut() {
+        return stringFechaCheckOut;
+    }
+
     @Override
     public String toString() {
         return this.id + ", " + this.fechaCheckIn + ", " + this.fechaCheckOut + ", " + this.importeTotal + ", " + this.formaPago;
@@ -86,31 +99,33 @@ public class Reserva {
     /**
      * Método que conecta con la base de datos y devuelve una lista con todos los registros de la tabla Reservas.
      *  */
-    public List<Map<String, String>> listar() throws SQLException {
+    public List<Map<String, String>> listar() {
         ReservaDAO reservaDAO = new ReservaDAO();
 
         return reservaDAO.listar();
     }
 
-    /**
-     * Método que realiza el registro de una reserva en base de datos a partir de un objeto instanciado de esta clase
-     * @throws SQLException
-     */
-    public void registarEnDB() throws SQLException {
+    public void registarEnDB() {
         ReservaDAO reservaDAO = new ReservaDAO();
         
         reservaDAO.registarEnDB(this);
     }
 
-    public void eliminar(int idReserva) throws SQLException {
+    public void eliminar(int idReserva) {
         ReservaDAO reservaDAO = new ReservaDAO();
 
         reservaDAO.eliminar(idReserva);
     }
 
-    public void editar(String fechaEntrada, String fechaSalida, double importeTotal, int formaPago, int idReserva) throws SQLException {
+    public void editar(String fechaEntrada, String fechaSalida, double importeTotal, int formaPago, int idReserva) {
         ReservaDAO reservaDAO = new ReservaDAO();
 
         reservaDAO.editar(fechaEntrada, fechaSalida, importeTotal, formaPago, idReserva);
+    }
+
+    public Reserva buscar(int idReserva) {
+        ReservaDAO reservaDAO = new ReservaDAO();
+
+        return reservaDAO.buscar(idReserva);
     }
 }

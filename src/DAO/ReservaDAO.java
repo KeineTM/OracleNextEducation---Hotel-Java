@@ -10,12 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import BackEnd.Reserva;
+import Controller.Huesped;
+import Controller.Reserva;
 import Factory.ConnectionFactory;
 
 // Capa de persistencia
 public class ReservaDAO {
-    public Double getCostoDeHabitacion(int tipoHabitacion) throws SQLException {
+    public Double getCostoDeHabitacion(int tipoHabitacion) {
         double costoDeHabitacion = 299;
         final Connection con = new ConnectionFactory().recuperaConexion();
         try(con) {
@@ -32,8 +33,8 @@ public class ReservaDAO {
                 }
             }
         
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return costoDeHabitacion;
     }
@@ -41,7 +42,7 @@ public class ReservaDAO {
     /**
      * Método que conecta con la base de datos y devuelve una lista con todos los registros de la tabla Reservas.
      *  */
-    public List<Map<String, String>> listar() throws SQLException {
+    public List<Map<String, String>> listar() {
         final Connection con = new ConnectionFactory().recuperaConexion();
         // Variable para almacenar el listado
         ArrayList<Map<String, String>> resultado = new ArrayList<>();
@@ -73,15 +74,16 @@ public class ReservaDAO {
                     }
                 }  
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return resultado;
     }
 
     /**
      * Método que realiza el registro de una reserva en base de datos a partir de un objeto instanciado de esta clase
-     * @throws SQLException
      */
-    public void registarEnDB(Reserva reserva) throws SQLException {
+    public void registarEnDB(Reserva reserva) {
         final Connection con = new ConnectionFactory().recuperaConexion();
 
         try(con) {
@@ -104,13 +106,13 @@ public class ReservaDAO {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         
     }
 
-    public void eliminar(int idReserva) throws SQLException {
+    public void eliminar(int idReserva) {
         final Connection con = new ConnectionFactory().recuperaConexion();
         try(con) {
             final PreparedStatement statement = con.prepareStatement("DELETE FROM Reservas WHERE Id= ?");
@@ -119,19 +121,19 @@ public class ReservaDAO {
                 statement.setInt(1, idReserva);
                 statement.execute();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void editar(String fechaEntrada, String fechaSalida, double importeTotal, int formaPago, int idReserva) throws SQLException {
+    public void editar(String fechaEntrada, String fechaSalida, double importeTotal, int formaPago, int idReserva) {
         final Connection con = new ConnectionFactory().recuperaConexion();
         try(con) {
             final PreparedStatement statement = con.prepareStatement("UPDATE Reservas"
                 + "SET FechaEntrada = ?,"
                 + "FechaSalida = ?,"
                 + "ImporteTotal = ?,"
-                + "FormaPago= ?,"
+                + "FormaPago = ?,"
                 + "WHERE Id= ?");
             try(statement) {
                 statement.setString(1, fechaEntrada);
@@ -142,9 +144,51 @@ public class ReservaDAO {
 
                 statement.execute();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public Reserva buscar(int idReserva) {
+        Reserva reserva = null;
+        Huesped huesped;
+        
+        final Connection con = new ConnectionFactory().recuperaConexion();
+        try(con) {
+            
+            final PreparedStatement statement = con.prepareStatement(" SELECT * FROM Reservas "
+            + "JOIN Huespedes "
+            + "ON Reservas.IdHuesped = Huespedes.Id "
+            + "WHERE Reservas.Id=?");
+            try(statement) {
+                statement.setInt(1, idReserva);
+                statement.execute();
+                
+                final ResultSet resultSet = statement.getResultSet();
+                try(resultSet) {
+                    while(resultSet.next()) {
+                        huesped = new Huesped(
+                            resultSet.getInt("IdHuesped"),
+                            resultSet.getString("Nombre"),
+                            resultSet.getString("Apellido"),
+                            resultSet.getString("FechaNacimiento"),
+                            resultSet.getString("Telefono"),
+                            resultSet.getString("Email"));
+
+                        reserva = new Reserva(
+                            resultSet.getInt("Id"), 
+                            resultSet.getString("FechaEntrada"), 
+                            resultSet.getString("FechaSalida"), 
+                            resultSet.getInt("FormaPago"),
+                            resultSet.getDouble("ImporteTotal"),
+                            huesped);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return reserva;
     }
     
 }
