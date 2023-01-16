@@ -29,9 +29,12 @@ public class Reserva {
         this.huesped = huesped;
     }
 
-    public Reserva(){}
-
-    
+    public Reserva(int tipoHabitacion, LocalDateTime fechaCheckIn, LocalDateTime fechaCheckOut, double importeTotal, int formaPago) {
+        this.fechaCheckIn = fechaCheckIn;
+        this.fechaCheckOut = fechaCheckOut;
+        this.importeTotal = importeTotal;
+        this.formaPago = formaPago;
+    }
 
     public Reserva(int id, String stringFechaCheckIn, String stringFechaCheckOut, int formaPago, double importeTotal, Huesped huesped) {
         this.id = id;
@@ -41,6 +44,17 @@ public class Reserva {
         this.formaPago = formaPago;
         this.huesped = huesped;
     }
+
+    public Reserva(){}
+
+    public Reserva(int id, String stringFechaCheckIn, String stringFechaCheckOut, int formaPago, double importeTotal) {
+        this.id = id;
+        this.stringFechaCheckIn = stringFechaCheckIn;
+        this.stringFechaCheckOut = stringFechaCheckOut;
+        this.importeTotal = importeTotal;
+        this.formaPago = formaPago;
+    }
+
 
     /**
      * Método que permite calcular los días de que abarca la reserva.
@@ -117,10 +131,10 @@ public class Reserva {
         reservaDAO.eliminar(idReserva);
     }
 
-    public void editar(String fechaEntrada, String fechaSalida, double importeTotal, int formaPago, int idReserva) {
+    public void editar() {
         ReservaDAO reservaDAO = new ReservaDAO();
 
-        reservaDAO.editar(fechaEntrada, fechaSalida, importeTotal, formaPago, idReserva);
+        reservaDAO.editar(this);
     }
 
     public Reserva buscar(int idReserva) {

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import Controller.Huesped;
 import Controller.Reserva;
 import Factory.ConnectionFactory;
@@ -126,29 +128,12 @@ public class ReservaDAO {
         }
     }
 
-    public void editar(String fechaEntrada, String fechaSalida, double importeTotal, int formaPago, int idReserva) {
-        final Connection con = new ConnectionFactory().recuperaConexion();
-        try(con) {
-            final PreparedStatement statement = con.prepareStatement("UPDATE Reservas"
-                + "SET FechaEntrada = ?,"
-                + "FechaSalida = ?,"
-                + "ImporteTotal = ?,"
-                + "FormaPago = ?,"
-                + "WHERE Id= ?");
-            try(statement) {
-                statement.setString(1, fechaEntrada);
-                statement.setString(2, fechaSalida);
-                statement.setDouble(3, importeTotal);
-                statement.setInt(4, formaPago);
-                statement.setInt(5, idReserva);
-
-                statement.execute();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    /**
+     * Método que busca y devuelve un objeto del tipo Reserva con su Huesped de acuerdo con un número entero recibido.
+     * En caso de no encontrarlo retornara una Reserva = null.
+     * @param idReserva
+     * @return
+     */
     public Reserva buscar(int idReserva) {
         Reserva reserva = null;
         Huesped huesped;
@@ -191,4 +176,28 @@ public class ReservaDAO {
         return reserva;
     }
     
+    public void editar(Reserva reserva) {
+        final Connection con = new ConnectionFactory().recuperaConexion();
+        try(con) {
+            final PreparedStatement statement = con.prepareStatement("UPDATE Reservas SET "
+                + " FechaEntrada = ?,"
+                + " FechaSalida = ?,"
+                + " ImporteTotal = ?,"
+                + " FormaPago = ?"
+                + " WHERE Id= ?;");
+            try(statement) {
+                statement.setString(1, reserva.getStringFechaCheckIn());
+                statement.setString(2, reserva.getStringFechaCheckOut());
+                statement.setDouble(3, reserva.getImporteTotal());
+                statement.setInt(4, reserva.getFormaPago());
+                statement.setInt(5, reserva.getId());
+
+                statement.executeUpdate();
+            }
+
+            JOptionPane.showMessageDialog(null, "Registro " + reserva.getId() + " editado con éxito.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

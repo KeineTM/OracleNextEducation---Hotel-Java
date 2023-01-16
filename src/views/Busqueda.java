@@ -8,10 +8,12 @@ import javax.swing.table.DefaultTableModel;
 
 import Controller.Huesped;
 import Controller.Reserva;
-
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,6 +27,8 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.Date;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @SuppressWarnings("serial")
@@ -36,6 +40,7 @@ public class Busqueda extends JFrame {
 	private JTable tbReservas;
 	private DefaultTableModel modelo;
 	private DefaultTableModel modeloH;
+	JComboBox formasPago;
 	private JLabel labelAtras;
 	private JLabel labelExit;
 	int xMouse, yMouse;
@@ -105,6 +110,7 @@ public class Busqueda extends JFrame {
 		
 		// Lógica para imprimir los registros de la tabla con la lista de reservas
 		cargarTablaReservas();
+		crearComboBoxFormasPago();
 
 		// Tabla para impresión de registros de la tabla Huéspedes		
 		tbHuespedes = new JTable();
@@ -238,6 +244,13 @@ public class Busqueda extends JFrame {
 		btnEditar.setBounds(635, 508, 122, 35);
 		btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnEditar);
+		btnEditar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// Lógica para la edición de resgistros desde la tabla hacia la base de datos.
+				editarReserva();
+			}
+		});
 		
 		JLabel lblEditar = new JLabel("EDITAR");
 		lblEditar.setHorizontalAlignment(SwingConstants.CENTER);
@@ -280,6 +293,22 @@ public class Busqueda extends JFrame {
         int y = evt.getYOnScreen();
         this.setLocation(x - xMouse, y - yMouse);
 	}
+
+	/**
+	 * Método que agrega una JComboBox para la edición del campo "FormaPago"
+	 */
+	private void crearComboBoxFormasPago() {
+        //Combo y valores
+        formasPago = new JComboBox();
+        formasPago.addItem("Efectivo");
+        formasPago.addItem("Tarjeta de Débito");
+        formasPago.addItem("Tarjeta de Crédito");
+        formasPago.addItem("Tarjeta de Regalo");
+
+        //se indica que columna tendra el JComboBox
+        javax.swing.table.TableColumn formaPagoColumn = tbReservas.getColumnModel().getColumn(4);
+		formaPagoColumn.setCellEditor(new DefaultCellEditor(formasPago));
+    }
 
 	private void cargarTablaReservas() {
 		// Instanciamiento de objeto de la clase Reserva para poder emplear el método que devuelve la lista de registros de la tabla
@@ -356,29 +385,52 @@ public class Busqueda extends JFrame {
 		
 	}
 
-	/*public void editarReserva() {
+	/**
+	 * Método para editar el registro directamente desde los campos de la Jtable en la ventana.
+	 * Detecta un sólo registro seleccionado y ejecuta la actualización en la tabla de la DB sobre él.
+	 * NO se pueden modificar los ID de la Reserva o del Huesped, ni cambiar la relación existente entre ellos.
+	 * Es decir, no se puede cambiar el IdHuesped del Huesped ligado a la Reserva.
+	 */
+	public void editarReserva() {
 		if(tbReservas.getSelectedRow() == -1 ) {
-			JOptionPane.showMessageDialog(this, "Seleccione un registro para eliminar.");
+			JOptionPane.showMessageDialog(this, "Seleccione un registro para editar.");
 		} else {
 			Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresentOrElse(fila -> {
 				Integer id = Integer.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString());
-	
-				Reserva reserva = new Reserva();
-				try {
-					reserva.editar(
-						modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())
-					);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-	
-				modelo.removeRow(tbReservas.getSelectedRow());
-				JOptionPane.showMessageDialog(this, "Reserva eliminada exitosamente.");
+
+				int registro = tbReservas.getSelectedRow();
+
+				Reserva reserva = new Reserva(
+					(int) id, // IdReserva
+					String.valueOf(this.modelo.getValueAt(registro, 1).toString()), // fechaEntrada
+					String.valueOf(this.modelo.getValueAt(registro, 2).toString()), // fechaSalida
+					formasPago.getSelectedIndex(), // formaPago
+					Double.parseDouble(this.modelo.getValueAt(registro, 3).toString()) // importeTotal
+				);
+			
+				reserva.editar();
+				
+				// Limpia la tabla
+				limpiarTabla(tbReservas, modelo);
+				// Reimprime el contenido de la tabla
+				cargarTablaReservas();
 	
 			}, () -> JOptionPane.showMessageDialog(this, "Seleccione una reserva."));
 		}
 		
-	}*/
+	}
+
+	/**
+	 * Método para limpiar la tabla
+	 * @param cadena
+	 * @return
+	 */
+	private static void limpiarTabla(JTable tabla, DefaultTableModel modelo) {
+		for (int i = 0; i < tabla.getRowCount(); i++) {
+			modelo.removeRow(i);
+			i-=1;
+		}
+	}
 
 	/**
 	 * Método para evaluar la entrada de números enteros (Integer)

@@ -28,8 +28,13 @@ public class UsuarioDAO {
                 
                 final ResultSet resultSet = statement.getResultSet();
                 try(resultSet) {
-                    if(resultSet.next() && resultSet.getString("Pass").equals(String.valueOf(usuario.getPassword())) ) return true; 
-                    else return false; 
+                    if(resultSet.next() && 
+                        resultSet.getString("Pass").equals(String.valueOf(usuario.getPassword())) ){
+                        return true; 
+                    } 
+                    else {
+                        return false;
+                    }
                 }
             }   
         } catch (SQLException e) {
