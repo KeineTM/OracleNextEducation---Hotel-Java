@@ -29,7 +29,7 @@ Hotel Alura - Back End </br>
      Este contiene el aspecto visual desarrollado totalmente en Java y con esta base se añadieron las funciones a botones, tablas, consultas y registros hacia la base de datos.
      Para la base de datos se utilizó <strong>MySQL</strong> mediante JDBC, una API diseñada como controlador de conexiones a bases de datos. En el diagrama dentro de la carpeta <strong>sql<strong> se encuentra la base de datos normalizada. Aunque esta no se encuentra totalmente implementada dentro de las consultas y registros que se hacen desde la aplicación en Java.
 
-     [DB Normalizada](https://github.com/KeineTM/OracleNextEducation---Hotel-Java/blob/repositorio-base/sql/diagrama_E-R_normalizada1.png)
+[DB Normalizada](https://github.com/KeineTM/OracleNextEducation---Hotel-Java/blob/repositorio-base/sql/diagrama_E-R_normalizada1.png)
 </p>
 
 <p align="center" >
@@ -51,7 +51,9 @@ Hotel Alura - Back End </br>
 
 <p align="center">
      Al seleccionar una fila de la tabla de Reservas es posible eliminar dicha fila mediante el botón <strong>Eliminar</strong>. Mientras que al modificar alguno de sus datos directamente se pueden ejecutar los cambios en la base de datos con el botón <strong>Editar</strong>. En el caso de que no se tenga seleccionada ninguna fila al pulsar el botón, se le informará al usuario.
+</p>
 
+<p align="center">
      En el campo del botón <strong>Buscar</strong> se valida que el usuario ingrese un número entero, para lanzar la notificación si esto ocurre, así como validar que el número solicitado exista en la tabla.
 
 ![Index Hotel-Java](screenshots/Buscar-error.PNG) <br>
